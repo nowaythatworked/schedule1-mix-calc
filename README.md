@@ -124,11 +124,77 @@ const options: OptimizationOptions = {
   maxSteps: 3,
   budgetLimit: 25,
   availableSubstances: ["Cuke", "Banana", "Chili"],
+  minAddictionLevel: 50, // Optional: minimum addiction percentage required
 };
 
 const result = optimizer.findOptimalMix(options);
 console.log(`Optimal profit: $${result.profit.toFixed(2)}`);
 ```
+
+### Multi-Product Optimization
+
+Find the optimal substance sequence that works best for multiple products simultaneously:
+
+```typescript
+import { MultiProductOptimizer } from "./optimization/multi-product-optimizer.js";
+
+const multiOptimizer = new MultiProductOptimizer();
+
+const options: MultiProductOptimizationOptions = {
+  baseProducts: ["OG Kush", "Meth"],
+  maxSteps: 3,
+  budgetLimit: 25,
+  minAddictionLevel: 60, // Optional: minimum addiction percentage for all products
+};
+
+const result = multiOptimizer.findOptimalMix(options);
+
+console.log(`Shared sequence: ${result.sequence.join(" → ")}`);
+console.log(`Total profit: $${result.totalProfit.toFixed(2)}`);
+console.log(`Cost savings vs individual: $${result.totalCost.toFixed(2)}`);
+
+// Individual product results
+result.productResults.forEach((productResult) => {
+  console.log(
+    `${productResult.product}: $${productResult.sellPrice.toFixed(2)}`
+  );
+});
+```
+
+### Addiction Constraints
+
+Both single and multi-product optimizers support addiction level constraints. Each effect has an addiction value (0.0-1.0), and you can specify a minimum addiction percentage that the final product must meet:
+
+```typescript
+// Single product with addiction constraint
+const result = optimizer.findOptimalMix({
+  baseProduct: "OG Kush",
+  maxSteps: 4,
+  minAddictionLevel: 50, // Final product must have addiction >= 50%
+});
+
+console.log(`Total addiction: ${result.totalAddiction}%`);
+console.log(`Meets requirement: ${result.totalAddiction >= 50}`);
+
+// Multi-product with addiction constraint (all products must meet minimum)
+const multiResult = multiOptimizer.findOptimalMix({
+  baseProducts: ["OG Kush", "Meth"],
+  maxSteps: 3,
+  minAddictionLevel: 60, // All products must have addiction >= 60%
+});
+
+multiResult.productResults.forEach((product) => {
+  console.log(`${product.product}: addiction ${product.totalAddiction}%`);
+});
+```
+
+**Addiction Mechanics:**
+
+- Each effect has an addiction value from 0.0 to 1.0 (decimal)
+- Total addiction percentage = sum of all effect addiction values × 100, capped at 100%
+- If `minAddictionLevel` is not specified or 0, no constraint is applied
+- For multi-product optimization, ALL products must meet the minimum addiction level
+- Addiction levels are displayed as percentages (0% to 100%)
 
 ## 🧪 Testing
 
@@ -142,6 +208,7 @@ npm test
 npm test -- src/data/__tests__/effects.test.ts
 npm test -- src/engine/__tests__/mixer.test.ts
 npm test -- src/optimization/__tests__/optimizer.test.ts
+npm test -- src/__tests__/multi-product-integration.test.ts
 
 # Watch mode for development
 npm run test:watch
@@ -160,7 +227,8 @@ src/
 │   ├── mixer.ts           # Mixing engine implementation
 │   └── __tests__/         # Engine tests
 ├── optimization/          # Optimization algorithms
-│   ├── optimizer.ts       # Main optimization engine
+│   ├── optimizer.ts       # Single-product optimization engine
+│   ├── multi-product-optimizer.ts  # Multi-product optimization engine
 │   └── __tests__/         # Optimization tests
 ├── types/                 # TypeScript type definitions
 │   └── index.ts          # Core type definitions
@@ -182,7 +250,7 @@ All data is based on the official [Schedule 1 Calculator](https://schedule1-calc
 - **Advanced Heuristics**: Machine learning for better profit estimation
 - **Interactive CLI**: Command-line interface for custom optimization
 - **Web Interface**: Browser-based calculator with visualization
-- **Batch Optimization**: Multiple product optimization simultaneously
+- **Advanced Multi-Product**: Weighted optimization and custom profit functions
 
 ## 📄 License
 

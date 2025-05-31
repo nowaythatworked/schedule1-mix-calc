@@ -52,6 +52,7 @@ export class Optimizer {
       options.maxSteps,
       availableSubstances,
       options.budgetLimit,
+      options.minAddictionLevel,
       []
     );
 
@@ -66,6 +67,7 @@ export class Optimizer {
     stepsRemaining: number,
     availableSubstances: SubstanceName[],
     budgetLimit?: number,
+    minAddictionLevel?: number,
     currentSequence: SubstanceName[] = []
   ): OptimizationResult | null {
     // Generate state key for memoization
@@ -92,6 +94,14 @@ export class Optimizer {
 
     // Base case: no more steps
     if (stepsRemaining === 0) {
+      // Check addiction constraint if specified
+      if (
+        minAddictionLevel &&
+        currentState.totalAddiction < minAddictionLevel
+      ) {
+        return null; // Does not meet minimum addiction requirement
+      }
+
       const result = this.createResult(currentState, currentSequence);
       this.updateGlobalBest(result);
       this.cache.set(stateKey, { result, stepsUsed: currentSequence.length });
@@ -119,6 +129,7 @@ export class Optimizer {
           stepsRemaining - 1,
           availableSubstances,
           budgetLimit,
+          minAddictionLevel,
           newSequence
         );
 
@@ -202,6 +213,7 @@ export class Optimizer {
       sellPrice: state.currentValue,
       profit,
       profitMargin,
+      totalAddiction: state.totalAddiction,
     };
   }
 

@@ -2,23 +2,67 @@
  * Core type definitions for Schedule 1 calculator
  */
 
-export type EffectName = 
-  | 'Anti-Gravity' | 'Athletic' | 'Balding' | 'Bright-Eyed' | 'Calming'
-  | 'Calorie-Dense' | 'Cyclopean' | 'Disorienting' | 'Electrifying' | 'Energizing'
-  | 'Euphoric' | 'Explosive' | 'Focused' | 'Foggy' | 'Gingeritis'
-  | 'Glowing' | 'Jennerising' | 'Laxative' | 'Long Faced' | 'Munchies'
-  | 'Paranoia' | 'Refreshing' | 'Schizophrenia' | 'Sedating' | 'Seizure-Inducing'
-  | 'Shrinking' | 'Slippery' | 'Smelly' | 'Sneaky' | 'Spicy'
-  | 'Thought-Provoking' | 'Toxic' | 'Tropic Thunder' | 'Zombifying';
+export type EffectName =
+  | "Anti-Gravity"
+  | "Athletic"
+  | "Balding"
+  | "Bright-Eyed"
+  | "Calming"
+  | "Calorie-Dense"
+  | "Cyclopean"
+  | "Disorienting"
+  | "Electrifying"
+  | "Energizing"
+  | "Euphoric"
+  | "Explosive"
+  | "Focused"
+  | "Foggy"
+  | "Gingeritis"
+  | "Glowing"
+  | "Jennerising"
+  | "Laxative"
+  | "Long Faced"
+  | "Munchies"
+  | "Paranoia"
+  | "Refreshing"
+  | "Schizophrenia"
+  | "Sedating"
+  | "Seizure-Inducing"
+  | "Shrinking"
+  | "Slippery"
+  | "Smelly"
+  | "Sneaky"
+  | "Spicy"
+  | "Thought-Provoking"
+  | "Toxic"
+  | "Tropic Thunder"
+  | "Zombifying";
 
-export type ProductName = 
-  | 'OG Kush' | 'Sour Diesel' | 'Green Crack' | 'Grandaddy Purple'
-  | 'Meth' | 'Cocaine';
+export type ProductName =
+  | "OG Kush"
+  | "Sour Diesel"
+  | "Green Crack"
+  | "Grandaddy Purple"
+  | "Meth"
+  | "Cocaine";
 
-export type SubstanceName = 
-  | 'Cuke' | 'Flu Medicine' | 'Gasoline' | 'Donut' | 'Energy Drink'
-  | 'Mouth Wash' | 'Motor Oil' | 'Banana' | 'Chili' | 'Iodine'
-  | 'Paracetamol' | 'Viagra' | 'Horse Semen' | 'Mega Bean' | 'Addy' | 'Battery';
+export type SubstanceName =
+  | "Cuke"
+  | "Flu Medicine"
+  | "Gasoline"
+  | "Donut"
+  | "Energy Drink"
+  | "Mouth Wash"
+  | "Motor Oil"
+  | "Banana"
+  | "Chili"
+  | "Iodine"
+  | "Paracetamol"
+  | "Viagra"
+  | "Horse Semen"
+  | "Mega Bean"
+  | "Addy"
+  | "Battery";
 
 export interface Effect {
   name: EffectName;
@@ -30,7 +74,7 @@ export interface Product {
   name: ProductName;
   basePrice: number;
   initialEffects: EffectName[];
-  category: 'weed' | 'stimulant';
+  category: "weed" | "stimulant";
 }
 
 export interface TransformationRule {
@@ -52,6 +96,7 @@ export interface MixState {
   totalCost: number;
   currentValue: number;
   profit: number;
+  totalAddiction: number;
 }
 
 export interface OptimizationResult {
@@ -62,6 +107,7 @@ export interface OptimizationResult {
   sellPrice: number;
   profit: number;
   profitMargin: number;
+  totalAddiction: number;
 }
 
 export interface OptimizationOptions {
@@ -70,4 +116,32 @@ export interface OptimizationOptions {
   availableSubstances?: SubstanceName[];
   targetEffects?: EffectName[];
   budgetLimit?: number;
+  minAddictionLevel?: number;
+}
+
+export interface MultiProductOptimizationOptions {
+  baseProducts: ProductName[];
+  maxSteps: number;
+  availableSubstances?: SubstanceName[];
+  budgetLimit?: number;
+  minAddictionLevel?: number;
+}
+
+export interface ProductMixResult {
+  product: ProductName;
+  mixState: MixState;
+  finalEffects: EffectName[];
+  sellPrice: number;
+  profit: number;
+  profitMargin: number;
+  totalAddiction: number;
+}
+
+export interface MultiProductOptimizationResult {
+  sequence: SubstanceName[];
+  productResults: ProductMixResult[];
+  totalCost: number;
+  totalSellPrice: number;
+  totalProfit: number;
+  averageProfitMargin: number;
 }
