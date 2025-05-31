@@ -1,6 +1,6 @@
-# Schedule 1 Optimal Mixing Calculator
+# Schedule 1 Optimal Mixing Calculator - Monorepo
 
-A sophisticated TypeScript-based optimization engine for the Schedule 1 game that finds optimal substance mixing sequences to maximize profit.
+A sophisticated TypeScript-based optimization engine for the Schedule 1 game that finds optimal substance mixing sequences to maximize profit. This repository is organized as a Turborepo monorepo for scalability and future expansion.
 
 ## 🎯 Features
 
@@ -10,22 +10,45 @@ A sophisticated TypeScript-based optimization engine for the Schedule 1 game tha
 - **Performance Optimized**: Memoization and pruning for efficient computation
 - **Type-Safe**: Full TypeScript implementation with comprehensive type definitions
 - **Test-Driven**: 40+ tests ensuring reliability and correctness
+- **Monorepo Structure**: Organized with Turborepo for efficient development and future packages
 
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
+# Install dependencies for all packages
 npm install
 
-# Run the full demo
-npm start
+# Build all packages
+npm run build
 
-# Or run simple examples
-npm run build && node quick-calc.js              # Quick JavaScript version
-npm run build && node dist/simple-calculator.js  # TypeScript version
+# Run tests for all packages
+npm run test
 
-# Run tests
-npm test
+# Run the calculator demo
+cd packages/calculator && npm run start
+
+# Development mode with watch
+npm run dev
+```
+
+## 📦 Packages
+
+### `@schedule1/calculator`
+
+The core optimization engine located in `packages/calculator/`. Contains all the mixing logic, optimization algorithms, and game data.
+
+```bash
+# Work with the calculator package specifically
+cd packages/calculator
+
+# Run the demo
+npm run start
+
+# Run tests in watch mode
+npm run test:watch
+
+# Development mode
+npm run dev
 ```
 
 ## 📊 Example Results
@@ -217,22 +240,56 @@ npm run test:watch
 ## 📁 Project Structure
 
 ```
-src/
-├── data/                    # Game data and constants
-│   ├── effects.ts          # Effect definitions and multipliers
-│   ├── products.ts         # Base product data
-│   ├── substances.ts       # Substance costs and rules
-│   └── __tests__/          # Data layer tests
-├── engine/                 # Core mixing logic
-│   ├── mixer.ts           # Mixing engine implementation
-│   └── __tests__/         # Engine tests
-├── optimization/          # Optimization algorithms
-│   ├── optimizer.ts       # Single-product optimization engine
-│   ├── multi-product-optimizer.ts  # Multi-product optimization engine
-│   └── __tests__/         # Optimization tests
-├── types/                 # TypeScript type definitions
-│   └── index.ts          # Core type definitions
-└── main.ts               # Demo application
+packages/
+└── calculator/             # Core calculator package
+    ├── src/
+    │   ├── data/                    # Game data and constants
+    │   │   ├── effects.ts          # Effect definitions and multipliers
+    │   │   ├── products.ts         # Base product data
+    │   │   ├── substances.ts       # Substance costs and rules
+    │   │   └── __tests__/          # Data layer tests
+    │   ├── engine/                 # Core mixing logic
+    │   │   ├── mixer.ts           # Mixing engine implementation
+    │   │   └── __tests__/         # Engine tests
+    │   ├── optimization/          # Optimization algorithms
+    │   │   ├── optimizer.ts       # Single-product optimization engine
+    │   │   ├── multi-product-optimizer.ts  # Multi-product optimization engine
+    │   │   └── __tests__/         # Optimization tests
+    │   ├── types/                 # TypeScript type definitions
+    │   │   └── index.ts          # Core type definitions
+    │   └── main.ts               # Demo application
+    ├── package.json              # Package configuration
+    ├── tsconfig.json            # TypeScript configuration
+    └── vitest.config.ts         # Test configuration
+
+# Root level
+├── package.json                 # Workspace configuration
+├── turbo.json                  # Turborepo configuration
+├── tsconfig.json               # Root TypeScript configuration
+└── README.md                   # This file
+```
+
+## 🏗️ Monorepo Architecture
+
+This project uses **Turborepo** for efficient monorepo management:
+
+- **Root workspace**: Manages dependencies and orchestrates builds
+- **Package isolation**: Each package has its own dependencies and configuration
+- **Shared tooling**: Common TypeScript and testing configurations
+- **Efficient caching**: Turborepo caches build and test results
+- **Parallel execution**: Tasks run in parallel across packages when possible
+
+### Adding New Packages
+
+To add a new package to the monorepo:
+
+```bash
+# Create new package directory
+mkdir packages/new-package
+
+# Create package.json with @schedule1/new-package name
+# Add to root package.json workspaces if needed
+# Update turbo.json tasks if the package has special requirements
 ```
 
 ## 🎮 Game Data Source

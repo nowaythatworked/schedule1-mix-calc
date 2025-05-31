@@ -1,26 +1,31 @@
 {
-  "name": "schedule1-calculator",
+  "name": "schedule1-calculator-monorepo",
   "version": "1.0.0",
-  "description": "Optimal mixing calculator for Schedule 1 game",
-  "main": "dist/main.js",
-  "type": "module",
+  "description": "Optimal mixing calculator for Schedule 1 game - Monorepo",
+  "private": true,
+  "packageManager": "npm@10.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "start": "npm run build && node dist/main.js",
-    "dev": "ts-node-esm src/main.ts",
-    "dev:watch": "ts-node-esm --watch src/main.ts"
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "test:ui": "turbo run test:ui",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean"
   },
-  "keywords": ["schedule1", "calculator", "optimization", "gaming"],
+  "keywords": [
+    "schedule1",
+    "calculator",
+    "optimization",
+    "gaming",
+    "monorepo"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.9.0",
-    "@vitest/ui": "^1.0.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2",
-    "vitest": "^1.0.0"
+    "turbo": "^2.5.4"
   }
 }

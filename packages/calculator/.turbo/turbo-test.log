@@ -1,0 +1,54 @@
+
+
+> @schedule1/calculator@1.0.0 test
+> vitest run
+
+[1G[0K
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90m/Users/jan/projects/private/schedule1-calculator/packages/calculator[39m
+
+[?25l [32m✓[39m [2msrc/data/__tests__/[22msubstances[2m.test.ts[22m[2m (9)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22meffects[2m.test.ts[22m[2m (7)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22mingredients[2m.test.ts[22m[2m (8)[22m
+ [90m·[39m [2msrc/__tests__/[22mintegration[2m.test.ts[22m[2m (6)[22m
+ [32m✓[39m [2msrc/engine/__tests__/[22mmixer[2m.test.ts[22m[2m (8)[22m
+ [90m·[39m [2msrc/__tests__/[22mmulti-product-integration[2m.test.ts[22m[2m (11)[22m
+ [90m·[39m [2msrc/optimization/__tests__/[22moptimizer[2m.test.ts[22m[2m (8)[22m
+[?25l[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G[90mstdout[2m | src/__tests__/multi-product-integration.test.ts[2m > [22m[2mMultiProductOptimizer[2m > [22m[2mshould find better combined solution than separate optimizations in some cases[22m[39m
+Cost savings: $8.00
+Multi-substance profit: $255.00
+Combined individual profit: $240.70
+
+[?25l [32m✓[39m [2msrc/data/__tests__/[22msubstances[2m.test.ts[22m[2m (9)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22meffects[2m.test.ts[22m[2m (7)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22mingredients[2m.test.ts[22m[2m (8)[22m
+ [90m·[39m [2msrc/__tests__/[22mintegration[2m.test.ts[22m[2m (6)[22m
+ [32m✓[39m [2msrc/engine/__tests__/[22mmixer[2m.test.ts[22m[2m (8)[22m
+ [32m✓[39m [2msrc/__tests__/[22mmulti-product-integration[2m.test.ts[22m[2m (11)[22m
+ [32m✓[39m [2msrc/optimization/__tests__/[22moptimizer[2m.test.ts[22m[2m (8)[22m
+[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[?25l[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G[90mstdout[2m | src/__tests__/integration.test.ts[2m > [22m[2mIntegration Tests[2m > [22m[2mshould demonstrate scaling performance[22m[39m
+1 steps: 0.04ms, profit: $60.40
+2 steps: 0.24ms, profit: $75.00
+3 steps: 3.16ms, profit: $87.10
+4 steps: 6.89ms, profit: $96.30
+
+[?25l [32m✓[39m [2msrc/data/__tests__/[22msubstances[2m.test.ts[22m[2m (9)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22meffects[2m.test.ts[22m[2m (7)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22mingredients[2m.test.ts[22m[2m (8)[22m
+ [32m✓[39m [2msrc/__tests__/[22mintegration[2m.test.ts[22m[2m (6)[22m[33m 1181[2mms[22m[39m
+ [32m✓[39m [2msrc/engine/__tests__/[22mmixer[2m.test.ts[22m[2m (8)[22m
+ [32m✓[39m [2msrc/__tests__/[22mmulti-product-integration[2m.test.ts[22m[2m (11)[22m
+ [32m✓[39m [2msrc/optimization/__tests__/[22moptimizer[2m.test.ts[22m[2m (8)[22m
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G [32m✓[39m [2msrc/data/__tests__/[22msubstances[2m.test.ts[22m[2m (9)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22meffects[2m.test.ts[22m[2m (7)[22m
+ [32m✓[39m [2msrc/data/__tests__/[22mingredients[2m.test.ts[22m[2m (8)[22m
+ [32m✓[39m [2msrc/__tests__/[22mintegration[2m.test.ts[22m[2m (6)[22m[33m 1181[2mms[22m[39m
+ [32m✓[39m [2msrc/engine/__tests__/[22mmixer[2m.test.ts[22m[2m (8)[22m
+ [32m✓[39m [2msrc/__tests__/[22mmulti-product-integration[2m.test.ts[22m[2m (11)[22m
+ [32m✓[39m [2msrc/optimization/__tests__/[22moptimizer[2m.test.ts[22m[2m (8)[22m
+
+[2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[32m57 passed[39m[22m[90m (57)[39m
+[2m   Start at [22m 19:31:27
+[2m   Duration [22m 1.45s[2m (transform 270ms, setup 1ms, collect 454ms, tests 1.27s, environment 1ms, prepare 442ms)[22m
+
+[?25h[?25h[1G[0K⠙[1G[0K

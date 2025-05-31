@@ -7,6 +7,8 @@
     "esModuleInterop": true,
     "allowJs": true,
     "checkJs": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -21,17 +23,19 @@
     "removeComments": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "composite": true
   },
-  "references": [
-    {
-      "path": "./packages/calculator"
-    }
+  "include": [
+    "src/**/*"
   ],
-  "files": [],
-  "include": [],
   "exclude": [
     "node_modules",
-    "dist"
-  ]
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }
