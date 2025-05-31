@@ -9,8 +9,8 @@ describe("Integration Tests", () => {
     optimizer = new Optimizer();
   });
 
-  test("should find profitable mixes for all base products", () => {
-    const products = [
+  test("should find profitable mixes for all base substances", () => {
+    const substances = [
       "OG Kush",
       "Sour Diesel",
       "Green Crack",
@@ -19,9 +19,9 @@ describe("Integration Tests", () => {
       "Cocaine",
     ] as const;
 
-    products.forEach((product) => {
+    substances.forEach((substance) => {
       const options: OptimizationOptions = {
-        baseProduct: product,
+        baseSubstance: substance,
         maxSteps: 2,
       };
 
@@ -30,16 +30,16 @@ describe("Integration Tests", () => {
       expect(result).toBeDefined();
       expect(result.profit).toBeGreaterThan(0);
       expect(result.sequence).toHaveLength(2);
-      expect(result.mixState.baseProduct).toBe(product);
+      expect(result.mixState.baseSubstance).toBe(substance);
     });
   });
 
   test("should handle complex optimization scenario", () => {
     const options: OptimizationOptions = {
-      baseProduct: "Cocaine",
+      baseSubstance: "Cocaine",
       maxSteps: 4,
       budgetLimit: 50,
-      availableSubstances: [
+      availableIngredients: [
         "Cuke",
         "Flu Medicine",
         "Donut",
@@ -56,15 +56,15 @@ describe("Integration Tests", () => {
     expect(result.profit).toBeGreaterThan(100); // Should be quite profitable with Cocaine
     expect(result.profitMargin).toBeGreaterThan(50); // Should have good margin
 
-    // Verify all substances used are from available list
-    result.sequence.forEach((substance) => {
-      expect(options.availableSubstances).toContain(substance);
+    // Verify all ingredients used are from available list
+    result.sequence.forEach((ingredient) => {
+      expect(options.availableIngredients).toContain(ingredient);
     });
   });
 
   test("should demonstrate scaling performance", () => {
     const baseOptions: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 1,
     };
 
@@ -93,9 +93,9 @@ describe("Integration Tests", () => {
   test("should validate game mechanics accuracy", () => {
     // Test known transformation: Banana transforms Calming to Sneaky
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush", // Has Calming effect
+      baseSubstance: "OG Kush", // Has Calming effect
       maxSteps: 1,
-      availableSubstances: ["Banana"],
+      availableIngredients: ["Banana"],
     };
 
     const result = optimizer.findOptimalMix(options);
@@ -107,8 +107,8 @@ describe("Integration Tests", () => {
 
   test("should respect 8-effect limit", () => {
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush",
-      maxSteps: 8, // Try to add many substances
+      baseSubstance: "OG Kush",
+      maxSteps: 8, // Try to add many ingredients
     };
 
     const result = optimizer.findOptimalMix(options);
@@ -118,7 +118,7 @@ describe("Integration Tests", () => {
 
   test("should find different optimal solutions for different constraints", () => {
     const baseOptions: OptimizationOptions = {
-      baseProduct: "Meth",
+      baseSubstance: "Meth",
       maxSteps: 4, // Increase steps to ensure unconstrained uses more budget
     };
 

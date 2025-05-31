@@ -5,37 +5,37 @@
 
 import type {
   MixState,
-  ProductName,
   SubstanceName,
+  IngredientName,
   EffectName,
 } from "../types/index.js";
-import { getProduct } from "../data/products.js";
 import { getSubstance } from "../data/substances.js";
+import { getIngredient } from "../data/ingredients.js";
 import { getEffect } from "../data/effects.js";
 
 export class Mixer {
   private static readonly MAX_EFFECTS = 8;
 
   /**
-   * Creates initial mix state from a base product
+   * Creates initial mix state from a base substance
    */
-  createInitialState(productName: ProductName): MixState {
-    const product = getProduct(productName);
-    if (!product) {
-      throw new Error(`Product not found: ${productName}`);
+  createInitialState(substanceName: SubstanceName): MixState {
+    const substance = getSubstance(substanceName);
+    if (!substance) {
+      throw new Error(`Substance not found: ${substanceName}`);
     }
 
-    const effects = new Set(product.initialEffects);
+    const effects = new Set(substance.initialEffects);
     const currentValue = this.calculateValueFromEffects(
-      product.basePrice,
+      substance.basePrice,
       effects
     );
     const totalAddiction = this.calculateTotalAddiction(effects);
 
     return {
-      baseProduct: productName,
+      baseSubstance: substanceName,
       effects,
-      substancesUsed: [],
+      ingredientsUsed: [],
       totalCost: 0,
       currentValue,
       profit: currentValue,
@@ -44,22 +44,22 @@ export class Mixer {
   }
 
   /**
-   * Applies a substance to the current mix state
+   * Applies an ingredient to the current mix state
    */
-  applySubstance(
+  applyIngredient(
     currentState: MixState,
-    substanceName: SubstanceName
+    ingredientName: IngredientName
   ): MixState {
-    const substance = getSubstance(substanceName);
-    if (!substance) {
-      throw new Error(`Substance not found: ${substanceName}`);
+    const ingredient = getIngredient(ingredientName);
+    if (!ingredient) {
+      throw new Error(`Ingredient not found: ${ingredientName}`);
     }
 
     // Create new effects set from current state
     const newEffects = new Set(currentState.effects);
 
     // Apply transformation rules
-    substance.transformationRules.forEach((rule) => {
+    ingredient.transformationRules.forEach((rule) => {
       if (newEffects.has(rule.condition)) {
         newEffects.delete(rule.condition);
         newEffects.add(rule.replacement);
@@ -69,12 +69,12 @@ export class Mixer {
     // Add default effect if there's space and it's not already present
     if (
       newEffects.size < Mixer.MAX_EFFECTS &&
-      !newEffects.has(substance.defaultEffect)
+      !newEffects.has(ingredient.defaultEffect)
     ) {
-      newEffects.add(substance.defaultEffect);
+      newEffects.add(ingredient.defaultEffect);
     }
 
-    const newTotalCost = currentState.totalCost + substance.cost;
+    const newTotalCost = currentState.totalCost + ingredient.cost;
     const newTotalAddiction = this.calculateTotalAddiction(newEffects);
     const newCurrentValue = this.calculateCurrentValue({
       ...currentState,
@@ -84,9 +84,9 @@ export class Mixer {
     });
 
     return {
-      baseProduct: currentState.baseProduct,
+      baseSubstance: currentState.baseSubstance,
       effects: newEffects,
-      substancesUsed: [...currentState.substancesUsed, substanceName],
+      ingredientsUsed: [...currentState.ingredientsUsed, ingredientName],
       totalCost: newTotalCost,
       currentValue: newCurrentValue,
       profit: newCurrentValue - newTotalCost,
@@ -95,31 +95,41 @@ export class Mixer {
   }
 
   /**
-   * Applies a sequence of substances to create final mix state
+   * Applies a sequence of ingredients to create final mix state
    */
   applySequence(
-    productName: ProductName,
-    substances: SubstanceName[]
+    substanceName: SubstanceName,
+    ingredients: IngredientName[]
   ): MixState {
-    let state = this.createInitialState(productName);
+    let state = this.createInitialState(substanceName);
 
-    substances.forEach((substance) => {
-      state = this.applySubstance(state, substance);
+    ingredients.forEach((ingredient) => {
+      state = this.applyIngredient(state, ingredient);
     });
 
     return state;
   }
 
   /**
+   * Backward compatibility method - applies an ingredient (old "substance")
+   */
+  applySubstance(
+    currentState: MixState,
+    ingredientName: IngredientName
+  ): MixState {
+    return this.applyIngredient(currentState, ingredientName);
+  }
+
+  /**
    * Calculates current value of the mix based on effects
    */
   calculateCurrentValue(state: MixState): number {
-    const product = getProduct(state.baseProduct);
-    if (!product) {
-      throw new Error(`Product not found: ${state.baseProduct}`);
+    const substance = getSubstance(state.baseSubstance);
+    if (!substance) {
+      throw new Error(`Substance not found: ${state.baseSubstance}`);
     }
 
-    return this.calculateValueFromEffects(product.basePrice, state.effects);
+    return this.calculateValueFromEffects(substance.basePrice, state.effects);
   }
 
   /**
@@ -174,20 +184,20 @@ export class Mixer {
   }
 
   /**
-   * Checks if adding a substance would exceed effect limit
+   * Checks if adding an ingredient would exceed effect limit
    */
   wouldExceedEffectLimit(
     state: MixState,
-    substanceName: SubstanceName
+    ingredientName: IngredientName
   ): boolean {
-    const substance = getSubstance(substanceName);
-    if (!substance) return false;
+    const ingredient = getIngredient(ingredientName);
+    if (!ingredient) return false;
 
-    // Simulate applying the substance
+    // Simulate applying the ingredient
     const tempEffects = new Set(state.effects);
 
     // Apply transformation rules
-    substance.transformationRules.forEach((rule) => {
+    ingredient.transformationRules.forEach((rule) => {
       if (tempEffects.has(rule.condition)) {
         tempEffects.delete(rule.condition);
         tempEffects.add(rule.replacement);
@@ -197,7 +207,7 @@ export class Mixer {
     // Check if adding default effect would exceed limit
     return (
       tempEffects.size >= Mixer.MAX_EFFECTS &&
-      !tempEffects.has(substance.defaultEffect)
+      !tempEffects.has(ingredient.defaultEffect)
     );
   }
 }

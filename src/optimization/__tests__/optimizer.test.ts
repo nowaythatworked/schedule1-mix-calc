@@ -11,7 +11,7 @@ describe("Optimizer", () => {
 
   test("should find optimal mix for single step", () => {
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 1,
     };
 
@@ -25,7 +25,7 @@ describe("Optimizer", () => {
 
   test("should find optimal mix for multiple steps", () => {
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 3,
     };
 
@@ -38,7 +38,7 @@ describe("Optimizer", () => {
 
   test("should respect budget limit", () => {
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 5,
       budgetLimit: 20, // Low budget
     };
@@ -48,42 +48,42 @@ describe("Optimizer", () => {
     expect(result.totalCost).toBeLessThanOrEqual(20);
   });
 
-  test("should work with different base products", () => {
+  test("should work with different base substances", () => {
     const options: OptimizationOptions = {
-      baseProduct: "Cocaine",
+      baseSubstance: "Cocaine",
       maxSteps: 2,
     };
 
     const result = optimizer.findOptimalMix(options);
 
     expect(result).toBeDefined();
-    expect(result.mixState.baseProduct).toBe("Cocaine");
+    expect(result.mixState.baseSubstance).toBe("Cocaine");
     expect(result.sequence).toHaveLength(2);
   });
 
-  test("should handle limited available substances", () => {
+  test("should handle limited available ingredients", () => {
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 2,
-      availableSubstances: ["Cuke", "Banana", "Gasoline"],
+      availableIngredients: ["Cuke", "Banana", "Gasoline"],
     };
 
     const result = optimizer.findOptimalMix(options);
 
     expect(result).toBeDefined();
-    result.sequence.forEach((substance) => {
-      expect(["Cuke", "Banana", "Gasoline"]).toContain(substance);
+    result.sequence.forEach((ingredient) => {
+      expect(["Cuke", "Banana", "Gasoline"]).toContain(ingredient);
     });
   });
 
   test("should return higher profit for more steps (generally)", () => {
     const options1: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 1,
     };
 
     const options2: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 3,
     };
 
@@ -96,7 +96,7 @@ describe("Optimizer", () => {
 
   test("should calculate profit margin correctly", () => {
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 2,
     };
 
@@ -106,9 +106,9 @@ describe("Optimizer", () => {
     expect(Math.abs(result.profitMargin - expectedMargin)).toBeLessThan(0.01);
   });
 
-  test("should handle zero steps (base product only)", () => {
+  test("should handle zero steps (base substance only)", () => {
     const options: OptimizationOptions = {
-      baseProduct: "OG Kush",
+      baseSubstance: "OG Kush",
       maxSteps: 0,
     };
 

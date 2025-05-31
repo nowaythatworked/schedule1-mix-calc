@@ -2,8 +2,8 @@ import { describe, test, expect, beforeEach } from "vitest";
 import { Mixer } from "../mixer.js";
 import type {
   EffectName,
-  ProductName,
   SubstanceName,
+  IngredientName,
 } from "../../types/index.js";
 
 describe("Mixer", () => {
@@ -13,20 +13,20 @@ describe("Mixer", () => {
     mixer = new Mixer();
   });
 
-  test("should create initial mix state from product", () => {
+  test("should create initial mix state from substance", () => {
     const state = mixer.createInitialState("OG Kush");
 
-    expect(state.baseProduct).toBe("OG Kush");
+    expect(state.baseSubstance).toBe("OG Kush");
     expect(state.effects).toEqual(new Set(["Calming"]));
-    expect(state.substancesUsed).toEqual([]);
+    expect(state.ingredientsUsed).toEqual([]);
     expect(state.totalCost).toBe(0);
   });
 
-  test("should apply substance to mix state", () => {
+  test("should apply ingredient to mix state", () => {
     const initialState = mixer.createInitialState("OG Kush");
-    const newState = mixer.applySubstance(initialState, "Cuke");
+    const newState = mixer.applyIngredient(initialState, "Cuke");
 
-    expect(newState.substancesUsed).toEqual(["Cuke"]);
+    expect(newState.ingredientsUsed).toEqual(["Cuke"]);
     expect(newState.totalCost).toBe(2); // Cuke costs 2 (GameSpot guide)
     expect(newState.effects.has("Energizing")).toBe(true); // Cuke's default effect
   });
@@ -86,23 +86,23 @@ describe("Mixer", () => {
     expect(profit).toBe(expectedProfit);
   });
 
-  test("should handle multiple substance applications", () => {
+  test("should handle multiple ingredient applications", () => {
     let state = mixer.createInitialState("OG Kush");
 
-    state = mixer.applySubstance(state, "Cuke");
-    state = mixer.applySubstance(state, "Flu Medicine");
+    state = mixer.applyIngredient(state, "Cuke");
+    state = mixer.applyIngredient(state, "Flu Medicine");
 
-    expect(state.substancesUsed).toEqual(["Cuke", "Flu Medicine"]);
+    expect(state.ingredientsUsed).toEqual(["Cuke", "Flu Medicine"]);
     expect(state.totalCost).toBe(7); // 2 + 5 (GameSpot guide costs)
     expect(state.effects.size).toBeGreaterThan(1);
   });
 
   test("should create valid mix sequence", () => {
-    const sequence: SubstanceName[] = ["Cuke", "Flu Medicine", "Donut"];
+    const sequence: IngredientName[] = ["Cuke", "Flu Medicine", "Donut"];
     const finalState = mixer.applySequence("OG Kush", sequence);
 
-    expect(finalState.baseProduct).toBe("OG Kush");
-    expect(finalState.substancesUsed).toEqual(sequence);
+    expect(finalState.baseSubstance).toBe("OG Kush");
+    expect(finalState.ingredientsUsed).toEqual(sequence);
     expect(finalState.totalCost).toBe(10); // 2 + 5 + 3 (GameSpot guide costs)
   });
 });

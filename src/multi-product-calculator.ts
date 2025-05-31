@@ -4,7 +4,7 @@
  */
 
 import { MultiProductOptimizer } from "./optimization/multi-product-optimizer.js";
-import type { MultiProductOptimizationOptions } from "./types/index.js";
+import type { MultiSubstanceOptimizationOptions } from "./types/index.js";
 
 // Create multi-product optimizer instance
 const optimizer = new MultiProductOptimizer();
@@ -12,12 +12,10 @@ const optimizer = new MultiProductOptimizer();
 // Example 1: Find optimal 3-step mix for OG Kush and Meth
 console.log("=== Multi-Product Optimization: OG Kush & Meth (3 steps) ===");
 
-const options1: MultiProductOptimizationOptions = {
-  baseProducts: ["OG Kush", "Meth"],
+const result1 = optimizer.findOptimalMix({
+  baseSubstances: ["OG Kush", "Meth"],
   maxSteps: 3,
-};
-
-const result1 = optimizer.findOptimalMix(options1);
+});
 
 console.log(`\nOptimal sequence: ${result1.sequence.join(" → ")}`);
 console.log(`Total cost: $${result1.totalCost.toFixed(2)}`);
@@ -27,24 +25,24 @@ console.log(
   `Average profit margin: ${result1.averageProfitMargin.toFixed(1)}%`
 );
 
-console.log("\nIndividual product results:");
-result1.productResults.forEach((productResult) => {
-  console.log(`  ${productResult.product}:`);
-  console.log(`    Sell price: $${productResult.sellPrice.toFixed(2)}`);
-  console.log(`    Individual profit: $${productResult.profit.toFixed(2)}`);
-  console.log(`    Profit margin: ${productResult.profitMargin.toFixed(1)}%`);
-  console.log(`    Total addiction: ${productResult.totalAddiction}%`);
-  console.log(`    Effects: ${productResult.finalEffects.join(", ")}`);
+console.log("\nIndividual substance results:");
+result1.substanceResults.forEach((substanceResult) => {
+  console.log(`  ${substanceResult.substance}:`);
+  console.log(`    Sell price: $${substanceResult.sellPrice.toFixed(2)}`);
+  console.log(`    Individual profit: $${substanceResult.profit.toFixed(2)}`);
+  console.log(`    Profit margin: ${substanceResult.profitMargin.toFixed(1)}%`);
+  console.log(`    Total addiction: ${substanceResult.totalAddiction}%`);
+  console.log(`    Effects: ${substanceResult.finalEffects.join(", ")}`);
 });
 
 // Example 2: Find optimal mix with budget constraint
 console.log("\n\n=== Multi-Product Optimization with Budget Limit ===");
 
-const options2: MultiProductOptimizationOptions = {
-  baseProducts: ["OG Kush", "Meth"],
+const options2: MultiSubstanceOptimizationOptions = {
+  baseSubstances: ["OG Kush", "Meth"],
   maxSteps: 4,
   budgetLimit: 15, // Limited budget
-  availableSubstances: ["Cuke", "Banana", "Chili", "Paracetamol"], // Limited substances
+  availableIngredients: ["Cuke", "Banana", "Chili", "Paracetamol"], // Limited ingredients
 };
 
 const result2 = optimizer.findOptimalMix(options2);
@@ -67,13 +65,13 @@ const singleOptimizer = new Optimizer();
 
 // Individual optimization for OG Kush
 const ogKushResult = singleOptimizer.findOptimalMix({
-  baseProduct: "OG Kush",
+  baseSubstance: "OG Kush",
   maxSteps: 3,
 });
 
 // Individual optimization for Meth
 const methResult = singleOptimizer.findOptimalMix({
-  baseProduct: "Meth",
+  baseSubstance: "Meth",
   maxSteps: 3,
 });
 
@@ -122,8 +120,8 @@ console.log(
 // Example 4: Three products
 console.log("\n\n=== Three Products: OG Kush, Meth & Cocaine ===");
 
-const options3: MultiProductOptimizationOptions = {
-  baseProducts: ["OG Kush", "Meth", "Cocaine"],
+const options3: MultiSubstanceOptimizationOptions = {
+  baseSubstances: ["OG Kush", "Meth", "Cocaine"],
   maxSteps: 3,
   budgetLimit: 25,
 };
@@ -138,13 +136,13 @@ console.log(
   `Average profit margin: ${result3.averageProfitMargin.toFixed(1)}%`
 );
 
-console.log("\nBreakdown by product:");
-result3.productResults.forEach((productResult) => {
+console.log("\nBreakdown by substance:");
+result3.substanceResults.forEach((substanceResult) => {
   console.log(
-    `  ${productResult.product}: $${productResult.sellPrice.toFixed(
+    `  ${substanceResult.substance}: $${substanceResult.sellPrice.toFixed(
       2
-    )} (${productResult.profitMargin.toFixed(1)}% margin, addiction: ${
-      productResult.totalAddiction
+    )} (${substanceResult.profitMargin.toFixed(1)}% margin, addiction: ${
+      substanceResult.totalAddiction
     }%)`
   );
 });
@@ -152,15 +150,15 @@ result3.productResults.forEach((productResult) => {
 // Example 5: Multi-product optimization with addiction constraint
 console.log("\n\n=== Multi-Product with Addiction Constraint (min 50%) ===");
 
-const options4: MultiProductOptimizationOptions = {
-  baseProducts: ["OG Kush", "Meth", "Cocaine"],
+const options4: MultiSubstanceOptimizationOptions = {
+  baseSubstances: ["OG Kush", "Meth", "Cocaine"],
   maxSteps: 3,
   minAddictionLevel: 90,
 };
 
 const result4 = optimizer.findOptimalMix(options4);
 
-if (result4.productResults.every((p) => p.totalAddiction >= 50)) {
+if (result4.substanceResults.every((p) => p.totalAddiction >= 50)) {
   console.log(`\nOptimal sequence: ${result4.sequence.join(" → ")}`);
   console.log(`Total cost: $${result4.totalCost.toFixed(2)}`);
   console.log(`Total sell price: $${result4.totalSellPrice.toFixed(2)}`);
@@ -169,16 +167,16 @@ if (result4.productResults.every((p) => p.totalAddiction >= 50)) {
     `Average profit margin: ${result4.averageProfitMargin.toFixed(1)}%`
   );
 
-  console.log("\nProduct results (all meet min addiction 50%):");
-  result4.productResults.forEach((productResult) => {
+  console.log("\nSubstance results (all meet min addiction 50%):");
+  result4.substanceResults.forEach((substanceResult) => {
     console.log(
-      `  ${productResult.product}: addiction ${
-        productResult.totalAddiction
-      }%, profit $${productResult.profit.toFixed(2)}`
+      `  ${substanceResult.substance}: addiction ${
+        substanceResult.totalAddiction
+      }%, profit $${substanceResult.profit.toFixed(2)}`
     );
   });
 } else {
   console.log(
-    "\n❌ No solution found where all products meet minimum addiction level of 50%"
+    "\n❌ No solution found where all substances meet minimum addiction level of 50%"
   );
 }

@@ -7,13 +7,13 @@ import type {
   OptimizationOptions,
   OptimizationResult,
   MixState,
-  SubstanceName,
+  IngredientName,
   EffectName,
 } from "../types/index.js";
 import { Mixer } from "../engine/mixer.js";
-import { getAllSubstances, getSubstance } from "../data/substances.js";
+import { getAllIngredients, getIngredient } from "../data/ingredients.js";
 import { getHighestValueEffects, getEffect } from "../data/effects.js";
-import { getProduct } from "../data/products.js";
+import { getSubstance } from "../data/substances.js";
 
 interface CacheEntry {
   result: OptimizationResult;
@@ -38,9 +38,9 @@ export class Optimizer {
     this.cache.clear();
     this.globalBest = null;
 
-    const availableSubstances =
-      options.availableSubstances || getAllSubstances();
-    const initialState = this.mixer.createInitialState(options.baseProduct);
+    const availableIngredients =
+      options.availableIngredients || getAllIngredients();
+    const initialState = this.mixer.createInitialState(options.baseSubstance);
 
     // Handle zero steps case
     if (options.maxSteps === 0) {
@@ -50,7 +50,7 @@ export class Optimizer {
     const result = this.search(
       initialState,
       options.maxSteps,
-      availableSubstances,
+      availableIngredients,
       options.budgetLimit,
       options.minAddictionLevel,
       []
@@ -65,10 +65,10 @@ export class Optimizer {
   private search(
     currentState: MixState,
     stepsRemaining: number,
-    availableSubstances: SubstanceName[],
+    availableIngredients: IngredientName[],
     budgetLimit?: number,
     minAddictionLevel?: number,
-    currentSequence: SubstanceName[] = []
+    currentSequence: IngredientName[] = []
   ): OptimizationResult | null {
     // Generate state key for memoization
     const stateKey = this.getStateKey(currentState.effects);
@@ -86,7 +86,7 @@ export class Optimizer {
     const maxPossibleProfit = this.estimateMaxProfit(
       currentState,
       stepsRemaining,
-      availableSubstances
+      availableIngredients
     );
     if (this.globalBest && maxPossibleProfit <= this.globalBest.profit) {
       return null; // Prune this branch
@@ -110,24 +110,25 @@ export class Optimizer {
 
     let bestResult: OptimizationResult | null = null;
 
-    // Try each available substance
-    for (const substance of availableSubstances) {
+    // Try each available ingredient
+    for (const ingredient of availableIngredients) {
       // Budget constraint check
       if (
         budgetLimit &&
-        currentState.totalCost + this.getSubstanceCost(substance) > budgetLimit
+        currentState.totalCost + this.getIngredientCost(ingredient) >
+          budgetLimit
       ) {
         continue;
       }
 
       try {
-        const newState = this.mixer.applySubstance(currentState, substance);
-        const newSequence = [...currentSequence, substance];
+        const newState = this.mixer.applyIngredient(currentState, ingredient);
+        const newSequence = [...currentSequence, ingredient];
 
         const result = this.search(
           newState,
           stepsRemaining - 1,
-          availableSubstances,
+          availableIngredients,
           budgetLimit,
           minAddictionLevel,
           newSequence
@@ -160,7 +161,7 @@ export class Optimizer {
   private estimateMaxProfit(
     state: MixState,
     stepsRemaining: number,
-    availableSubstances: SubstanceName[]
+    availableIngredients: IngredientName[]
   ): number {
     if (stepsRemaining === 0) {
       return this.mixer.calculateProfit(state);
@@ -176,9 +177,9 @@ export class Optimizer {
       }
     });
 
-    // Find cheapest substances for cost estimation
-    const cheapestCosts = availableSubstances
-      .map((name) => this.getSubstanceCost(name))
+    // Find cheapest ingredients for cost estimation
+    const cheapestCosts = availableIngredients
+      .map((name) => this.getIngredientCost(name))
       .sort((a, b) => a - b)
       .slice(0, stepsRemaining);
 
@@ -186,7 +187,7 @@ export class Optimizer {
       (sum, cost) => sum + cost,
       0
     );
-    const basePrice = this.getBasePrice(state.baseProduct);
+    const basePrice = this.getBasePrice(state.baseSubstance);
     const currentMultiplier = this.getCurrentMultiplier(state);
 
     const optimisticValue =
@@ -199,7 +200,7 @@ export class Optimizer {
    */
   private createResult(
     state: MixState,
-    sequence: SubstanceName[]
+    sequence: IngredientName[]
   ): OptimizationResult {
     const profit = this.mixer.calculateProfit(state);
     const profitMargin =
@@ -236,14 +237,14 @@ export class Optimizer {
   /**
    * Helper methods for calculations
    */
-  private getSubstanceCost(substanceName: SubstanceName): number {
-    const substance = getSubstance(substanceName);
-    return substance?.cost ?? 0;
+  private getIngredientCost(ingredientName: IngredientName): number {
+    const ingredient = getIngredient(ingredientName);
+    return ingredient?.cost ?? 0;
   }
 
-  private getBasePrice(productName: string): number {
-    const product = getProduct(productName as any);
-    return product?.basePrice ?? 35;
+  private getBasePrice(substanceName: string): number {
+    const substance = getSubstance(substanceName as any);
+    return substance?.basePrice ?? 35;
   }
 
   private getCurrentMultiplier(state: MixState): number {

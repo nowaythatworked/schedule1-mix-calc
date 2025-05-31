@@ -10,14 +10,14 @@ const optimizer = new Optimizer();
 
 // Calculate optimal 3-step mix for OG Kush
 const result = optimizer.findOptimalMix({
-  baseProduct: "OG Kush",
+  baseSubstance: "OG Kush",
   maxSteps: 4,
 });
 
 // Display results
 console.log("====================================================");
 console.log();
-console.log(`Base Product: ${result.mixState.baseProduct}`);
+console.log(`Base Substance: ${result.mixState.baseSubstance}`);
 console.log(`Optimal Sequence: ${result.sequence.join(" → ")}`);
 console.log(`Final Effects: ${result.finalEffects.join(", ")}`);
 console.log();
@@ -35,14 +35,14 @@ console.log("🧪 Example with Addiction Constraint (min 50%)");
 console.log("====================================================");
 
 const resultWithAddiction = optimizer.findOptimalMix({
-  baseProduct: "Cocaine",
+  baseSubstance: "Cocaine",
   maxSteps: 3,
   // minAddictionLevel: 50,
 });
 
 if (resultWithAddiction.totalAddiction >= 50) {
   console.log();
-  console.log(`Base Product: ${resultWithAddiction.mixState.baseProduct}`);
+  console.log(`Base Substance: ${resultWithAddiction.mixState.baseSubstance}`);
   console.log(`Optimal Sequence: ${resultWithAddiction.sequence.join(" → ")}`);
   console.log(`Final Effects: ${resultWithAddiction.finalEffects.join(", ")}`);
   console.log();

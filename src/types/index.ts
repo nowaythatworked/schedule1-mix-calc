@@ -38,7 +38,7 @@ export type EffectName =
   | "Tropic Thunder"
   | "Zombifying";
 
-export type ProductName =
+export type SubstanceName =
   | "OG Kush"
   | "Sour Diesel"
   | "Green Crack"
@@ -46,7 +46,7 @@ export type ProductName =
   | "Meth"
   | "Cocaine";
 
-export type SubstanceName =
+export type IngredientName =
   | "Cuke"
   | "Flu Medicine"
   | "Gasoline"
@@ -70,8 +70,8 @@ export interface Effect {
   addiction?: number;
 }
 
-export interface Product {
-  name: ProductName;
+export interface Substance {
+  name: SubstanceName;
   basePrice: number;
   initialEffects: EffectName[];
   category: "weed" | "stimulant";
@@ -82,17 +82,17 @@ export interface TransformationRule {
   replacement: EffectName;
 }
 
-export interface Substance {
-  name: SubstanceName;
+export interface Ingredient {
+  name: IngredientName;
   cost: number;
   defaultEffect: EffectName;
   transformationRules: TransformationRule[];
 }
 
 export interface MixState {
-  baseProduct: ProductName;
+  baseSubstance: SubstanceName;
   effects: Set<EffectName>;
-  substancesUsed: SubstanceName[];
+  ingredientsUsed: IngredientName[];
   totalCost: number;
   currentValue: number;
   profit: number;
@@ -101,7 +101,7 @@ export interface MixState {
 
 export interface OptimizationResult {
   mixState: MixState;
-  sequence: SubstanceName[];
+  sequence: IngredientName[];
   finalEffects: EffectName[];
   totalCost: number;
   sellPrice: number;
@@ -111,24 +111,24 @@ export interface OptimizationResult {
 }
 
 export interface OptimizationOptions {
-  baseProduct: ProductName;
+  baseSubstance: SubstanceName;
   maxSteps: number;
-  availableSubstances?: SubstanceName[];
+  availableIngredients?: IngredientName[];
   targetEffects?: EffectName[];
   budgetLimit?: number;
   minAddictionLevel?: number;
 }
 
-export interface MultiProductOptimizationOptions {
-  baseProducts: ProductName[];
+export interface MultiSubstanceOptimizationOptions {
+  baseSubstances: SubstanceName[];
   maxSteps: number;
-  availableSubstances?: SubstanceName[];
+  availableIngredients?: IngredientName[];
   budgetLimit?: number;
   minAddictionLevel?: number;
 }
 
-export interface ProductMixResult {
-  product: ProductName;
+export interface SubstanceMixResult {
+  substance: SubstanceName;
   mixState: MixState;
   finalEffects: EffectName[];
   sellPrice: number;
@@ -137,9 +137,9 @@ export interface ProductMixResult {
   totalAddiction: number;
 }
 
-export interface MultiProductOptimizationResult {
-  sequence: SubstanceName[];
-  productResults: ProductMixResult[];
+export interface MultiSubstanceOptimizationResult {
+  sequence: IngredientName[];
+  substanceResults: SubstanceMixResult[];
   totalCost: number;
   totalSellPrice: number;
   totalProfit: number;

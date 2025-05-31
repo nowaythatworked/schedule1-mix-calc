@@ -4,28 +4,28 @@
  */
 
 import type {
-  MultiProductOptimizationOptions,
-  MultiProductOptimizationResult,
-  ProductMixResult,
+  MultiSubstanceOptimizationOptions,
+  MultiSubstanceOptimizationResult,
+  SubstanceMixResult,
   MixState,
+  IngredientName,
   SubstanceName,
-  ProductName,
   EffectName,
 } from "../types/index.js";
 import { Mixer } from "../engine/mixer.js";
-import { getAllSubstances, getSubstance } from "../data/substances.js";
+import { getAllIngredients, getIngredient } from "../data/ingredients.js";
 import { getHighestValueEffects, getEffect } from "../data/effects.js";
-import { getProduct } from "../data/products.js";
+import { getSubstance } from "../data/substances.js";
 
-interface MultiProductCacheEntry {
-  result: MultiProductOptimizationResult;
+interface MultiSubstanceCacheEntry {
+  result: MultiSubstanceOptimizationResult;
   stepsUsed: number;
 }
 
 export class MultiProductOptimizer {
   private mixer: Mixer;
-  private cache: Map<string, MultiProductCacheEntry>;
-  private globalBest: MultiProductOptimizationResult | null;
+  private cache: Map<string, MultiSubstanceCacheEntry>;
+  private globalBest: MultiSubstanceOptimizationResult | null;
 
   constructor() {
     this.mixer = new Mixer();
@@ -37,22 +37,22 @@ export class MultiProductOptimizer {
    * Finds the optimal mix sequence for multiple products
    */
   findOptimalMix(
-    options: MultiProductOptimizationOptions
-  ): MultiProductOptimizationResult {
+    options: MultiSubstanceOptimizationOptions
+  ): MultiSubstanceOptimizationResult {
     this.cache.clear();
     this.globalBest = null;
 
-    if (options.baseProducts.length === 0) {
-      throw new Error("At least one base product must be specified");
+    if (options.baseSubstances.length === 0) {
+      throw new Error("At least one base substance must be specified");
     }
 
-    const availableSubstances =
-      options.availableSubstances || getAllSubstances();
+    const availableIngredients =
+      options.availableIngredients || getAllIngredients();
 
-    // Create initial states for all products
-    const initialStates = new Map<ProductName, MixState>();
-    for (const product of options.baseProducts) {
-      initialStates.set(product, this.mixer.createInitialState(product));
+    // Create initial states for all substances
+    const initialStates = new Map<SubstanceName, MixState>();
+    for (const substance of options.baseSubstances) {
+      initialStates.set(substance, this.mixer.createInitialState(substance));
     }
 
     // Handle zero steps case
@@ -63,7 +63,7 @@ export class MultiProductOptimizer {
     const result = this.search(
       initialStates,
       options.maxSteps,
-      availableSubstances,
+      availableIngredients,
       options.budgetLimit,
       options.minAddictionLevel,
       []
@@ -76,15 +76,15 @@ export class MultiProductOptimizer {
    * Recursive search with memoization and branch & bound for multiple products
    */
   private search(
-    currentStates: Map<ProductName, MixState>,
+    currentStates: Map<SubstanceName, MixState>,
     stepsRemaining: number,
-    availableSubstances: SubstanceName[],
+    availableIngredients: IngredientName[],
     budgetLimit?: number,
     minAddictionLevel?: number,
-    currentSequence: SubstanceName[] = []
-  ): MultiProductOptimizationResult | null {
-    // Generate state key for memoization (combine all product states)
-    const stateKey = this.getMultiProductStateKey(currentStates);
+    currentSequence: IngredientName[] = []
+  ): MultiSubstanceOptimizationResult | null {
+    // Generate state key for memoization (combine all substance states)
+    const stateKey = this.getMultiSubstanceStateKey(currentStates);
 
     // Check cache
     const cached = this.cache.get(stateKey);
@@ -99,7 +99,7 @@ export class MultiProductOptimizer {
     const maxPossibleProfit = this.estimateMaxCombinedProfit(
       currentStates,
       stepsRemaining,
-      availableSubstances
+      availableIngredients
     );
     if (this.globalBest && maxPossibleProfit <= this.globalBest.totalProfit) {
       return null; // Prune this branch
@@ -122,27 +122,27 @@ export class MultiProductOptimizer {
       return result;
     }
 
-    let bestResult: MultiProductOptimizationResult | null = null;
+    let bestResult: MultiSubstanceOptimizationResult | null = null;
 
-    // Try each available substance
-    for (const substance of availableSubstances) {
-      // Budget constraint check (shared across all products)
-      const substanceCost = this.getSubstanceCost(substance);
+    // Try each available ingredient
+    for (const ingredient of availableIngredients) {
+      // Budget constraint check (shared across all substances)
+      const ingredientCost = this.getIngredientCost(ingredient);
       const currentTotalCost = this.getTotalCost(currentStates);
 
-      if (budgetLimit && currentTotalCost + substanceCost > budgetLimit) {
+      if (budgetLimit && currentTotalCost + ingredientCost > budgetLimit) {
         continue;
       }
 
       try {
-        // Apply substance to all products
-        const newStates = new Map<ProductName, MixState>();
+        // Apply ingredient to all substances
+        const newStates = new Map<SubstanceName, MixState>();
         let validApplication = true;
 
-        for (const [productName, state] of currentStates) {
+        for (const [substanceName, state] of currentStates) {
           try {
-            const newState = this.mixer.applySubstance(state, substance);
-            newStates.set(productName, newState);
+            const newState = this.mixer.applyIngredient(state, ingredient);
+            newStates.set(substanceName, newState);
           } catch (error) {
             validApplication = false;
             break;
@@ -153,12 +153,12 @@ export class MultiProductOptimizer {
           continue;
         }
 
-        const newSequence = [...currentSequence, substance];
+        const newSequence = [...currentSequence, ingredient];
 
         const result = this.search(
           newStates,
           stepsRemaining - 1,
-          availableSubstances,
+          availableIngredients,
           budgetLimit,
           minAddictionLevel,
           newSequence
@@ -192,9 +192,9 @@ export class MultiProductOptimizer {
    * Estimates maximum possible combined profit for branch and bound pruning
    */
   private estimateMaxCombinedProfit(
-    states: Map<ProductName, MixState>,
+    states: Map<SubstanceName, MixState>,
     stepsRemaining: number,
-    availableSubstances: SubstanceName[]
+    availableIngredients: IngredientName[]
   ): number {
     if (stepsRemaining === 0) {
       return this.calculateCombinedProfit(states);
@@ -202,8 +202,8 @@ export class MultiProductOptimizer {
 
     let totalOptimisticProfit = 0;
 
-    // For each product, estimate optimistic profit improvement
-    for (const [productName, state] of states) {
+    // For each substance, estimate optimistic profit improvement
+    for (const [substanceName, state] of states) {
       const highestEffects = getHighestValueEffects(stepsRemaining);
       let optimisticMultiplier = 0;
 
@@ -213,7 +213,7 @@ export class MultiProductOptimizer {
         }
       });
 
-      const basePrice = this.getBasePrice(productName);
+      const basePrice = this.getBasePrice(substanceName);
       const currentMultiplier = this.getCurrentMultiplier(state);
       const optimisticValue =
         basePrice * (1 + currentMultiplier + optimisticMultiplier);
@@ -221,9 +221,9 @@ export class MultiProductOptimizer {
       totalOptimisticProfit += optimisticValue - state.totalCost;
     }
 
-    // Subtract estimated additional costs (shared across products)
-    const cheapestCosts = availableSubstances
-      .map((name) => this.getSubstanceCost(name))
+    // Subtract estimated additional costs (shared across substances)
+    const cheapestCosts = availableIngredients
+      .map((name) => this.getIngredientCost(name))
       .sort((a, b) => a - b)
       .slice(0, stepsRemaining);
 
@@ -239,21 +239,21 @@ export class MultiProductOptimizer {
    * Creates multi-product optimization result
    */
   private createResult(
-    states: Map<ProductName, MixState>,
-    sequence: SubstanceName[]
-  ): MultiProductOptimizationResult {
-    const productResults: ProductMixResult[] = [];
+    states: Map<SubstanceName, MixState>,
+    sequence: IngredientName[]
+  ): MultiSubstanceOptimizationResult {
+    const substanceResults: SubstanceMixResult[] = [];
     let totalSellPrice = 0;
     let totalProfit = 0;
     const totalCost = sequence.length > 0 ? this.getTotalCost(states) : 0;
 
-    for (const [productName, state] of states) {
+    for (const [substanceName, state] of states) {
       const profit = this.mixer.calculateProfit(state);
       const profitMargin =
         state.currentValue > 0 ? (profit / state.currentValue) * 100 : 0;
 
-      const productResult: ProductMixResult = {
-        product: productName,
+      const substanceResult: SubstanceMixResult = {
+        substance: substanceName,
         mixState: state,
         finalEffects: this.mixer.getEffectsArray(state),
         sellPrice: state.currentValue,
@@ -262,7 +262,7 @@ export class MultiProductOptimizer {
         totalAddiction: state.totalAddiction,
       };
 
-      productResults.push(productResult);
+      substanceResults.push(substanceResult);
       totalSellPrice += state.currentValue;
       totalProfit += profit;
     }
@@ -274,7 +274,7 @@ export class MultiProductOptimizer {
 
     return {
       sequence,
-      productResults,
+      substanceResults,
       totalCost,
       totalSellPrice,
       totalProfit: adjustedTotalProfit,
@@ -285,7 +285,9 @@ export class MultiProductOptimizer {
   /**
    * Helper methods
    */
-  private calculateCombinedProfit(states: Map<ProductName, MixState>): number {
+  private calculateCombinedProfit(
+    states: Map<SubstanceName, MixState>
+  ): number {
     let totalSellPrice = 0;
     let totalCost = 0;
 
@@ -297,37 +299,39 @@ export class MultiProductOptimizer {
     return totalSellPrice - totalCost;
   }
 
-  private getTotalCost(states: Map<ProductName, MixState>): number {
-    // All products share the same cost since they use the same sequence
+  private getTotalCost(states: Map<SubstanceName, MixState>): number {
+    // All substances share the same cost since they use the same sequence
     const firstState = states.values().next().value;
     return firstState ? firstState.totalCost : 0;
   }
 
-  private getMultiProductStateKey(states: Map<ProductName, MixState>): string {
+  private getMultiSubstanceStateKey(
+    states: Map<SubstanceName, MixState>
+  ): string {
     const stateKeys: string[] = [];
 
-    for (const [productName, state] of states) {
+    for (const [substanceName, state] of states) {
       const effectsKey = Array.from(state.effects).sort().join(",");
-      stateKeys.push(`${productName}:${effectsKey}`);
+      stateKeys.push(`${substanceName}:${effectsKey}`);
     }
 
     return stateKeys.sort().join("|");
   }
 
-  private updateGlobalBest(result: MultiProductOptimizationResult): void {
+  private updateGlobalBest(result: MultiSubstanceOptimizationResult): void {
     if (!this.globalBest || result.totalProfit > this.globalBest.totalProfit) {
       this.globalBest = result;
     }
   }
 
-  private getSubstanceCost(substanceName: SubstanceName): number {
-    const substance = getSubstance(substanceName);
-    return substance?.cost ?? 0;
+  private getIngredientCost(ingredientName: IngredientName): number {
+    const ingredient = getIngredient(ingredientName);
+    return ingredient?.cost ?? 0;
   }
 
-  private getBasePrice(productName: ProductName): number {
-    const product = getProduct(productName);
-    return product?.basePrice ?? 35;
+  private getBasePrice(substanceName: SubstanceName): number {
+    const substance = getSubstance(substanceName);
+    return substance?.basePrice ?? 35;
   }
 
   private getCurrentMultiplier(state: MixState): number {
